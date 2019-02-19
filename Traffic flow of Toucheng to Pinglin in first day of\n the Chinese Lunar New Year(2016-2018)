@@ -1,1 +1,47 @@
+install.packages("ggplot2")
+install.packages("ggthemes")
+install.packages("magrittr")
+install.packages("RColorBrewer")
+library(magrittr)
+library(ggplot2)
+library(ggthemes)
+library(RColorBrewer)
+
+#preceding operation
+setwd("C:/Users/User/Desktop/Eric/data/first day of Chinese Lunar New Year")
+
+FD1618<-do.call(rbind,lapply(list.files(path="C:/Users/User/Desktop/Eric/data/first day of Chinese Lunar New Year",pattern="*.csv"),read.table, header=FALSE, sep=","))    #讀取資料
+
+names(FD1618)<-c("time", "o", "NS", "VehicleType", "flow") #命名欄位名稱
+
+FD1618_TP<-subset(FD1618, o=="05F0287N")
+
+FD1618_TP_31<-subset(FD1618_TP, VehicleType==31)
+
+date<-as.Date(FD1618_TP_31$time)
+
+FD1618_TP_31$time<-substr(FD1618_TP_31$time,start = 12, stop = 16)
+
+FD1618_TP_31<-cbind(FD1618_TP_31,date)
+
+t<-c()
+for (i in 1:47) {
+       if(i%%2==0){
+             t[i]=n2[i/2]
+         }else{
+               t[i]=n1[ceiling(i/2)]
+           }
+   }
+t<-c(0,t)
+time<-rep(t,3)
+
+FD1618_1_TP_31<-cbind(FD1618_TP_31,time)
+
+#aggregate by timeinterval
+FD1618_2_TP_31<-aggregate(flow~date+timeFD1618_1_TP_31,mean)
+
+#data visualization
+FD1618_2_TP_31$date<-as.character(FD1618_2_TP_31$date)
+
+ggplot(FD1618_2_TP_31,mapping = aes(x=time, y=flow, group=date, colour=date))+geom_line(linetype = "solid",size=1.5)+labs(title="Traffic flow of Toucheng to Pinglin  in first day of\n the Chinese Lunar New Year(2016-2018)", x="time", y="flow")+theme_stata()+theme(axis.title.x = element_text(size = 15, face = "bold", vjust = 0.5, hjust = 0.5))+theme(axis.title.y = element_text(size = 15, face = "bold", vjust = 0.5, hjust = 0.5, angle = 360))+ theme(axis.text.y = element_text(angle = 360))+ theme(plot.title = element_text(size=15,face = "bold"))+scale_color_manual(values =c("#f9c00c","#00b9f1","#7200da"))
 
