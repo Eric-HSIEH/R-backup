@@ -8,37 +8,39 @@ library(ggthemes)
 library(RColorBrewer)
 
 #preceding operation
-setwd("C:/Users/User/Desktop/Eric/data/first day of Chinese Lunar New Year")
+setwd("C:/Users/User/Desktop/Eric/data/2016-2018first day")
 
-FD1618<-do.call(rbind,lapply(list.files(path="C:/Users/User/Desktop/Eric/data/first day of Chinese Lunar New Year",pattern="*.csv"),read.table, header=FALSE, sep=","))    #讀取資料
+FD1618<-do.call(rbind,lapply(list.files(path="C:/Users/User/Desktop/Eric/data/2016-2018first day",pattern="*.csv"),read.table, header=FALSE, sep=","))    #讀取資料
 
-names(FD1618)<-c("time", "o", "NS", "VehicleType", "flow") #命名欄位名稱
+names(FD1618)<-c("date time", "o", "NS", "VehicleType", "flow") #colanme
 
 FD1618_TP<-subset(FD1618, o=="05F0287N")
 
 FD1618_TP_31<-subset(FD1618_TP, VehicleType==31)
 
-date<-as.Date(FD1618_TP_31$time)
-
-FD1618_TP_31$time<-substr(FD1618_TP_31$time,start = 12, stop = 16)
+date<-as.Date(FD1618_TP_31$`date time`)
 
 FD1618_TP_31<-cbind(FD1618_TP_31,date)
 
+
+n1<-seq(100,2400,by=100)
+n2<-seq(0030,2330,by=100)
 t<-c()
-for (i in 1:47) {
-       if(i%%2==0){
-             t[i]=n2[i/2]
-         }else{
-               t[i]=n1[ceiling(i/2)]
-           }
-   }
-t<-c(0,t)
-time<-rep(t,3)
+for (i in 1:48) {
+  if(i%%2==0){
+    t[i]=n1[i/2]
+  }else{
+    t[i]=n2[ceiling(i/2)]
+  }
+}
+
+t2<-c(0000,rep(t[-48],each=6),rep(t[48],each=5))
+time<-rep(t2,3)
 
 FD1618_1_TP_31<-cbind(FD1618_TP_31,time)
 
-#aggregate by timeinterval
-FD1618_2_TP_31<-aggregate(flow~date+timeFD1618_1_TP_31,mean)
+#aggregate by date and time
+FD1618_2_TP_31<-aggregate(flow~date+time,FD1618_1_TP_31,mean)
 
 #data visualization
 FD1618_2_TP_31$date<-as.character(FD1618_2_TP_31$date)
