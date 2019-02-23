@@ -1,0 +1,5 @@
+■dplyr
+
+datetimeList<-str_split(dataset$column1,pattern = " ")
+datetimeMatrix<-data.frame(Reduce(rbind,datetimeList))
+names(datetimeMatrix)<-c("date","time")
